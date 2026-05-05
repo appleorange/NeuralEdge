@@ -24,14 +24,15 @@
 - [x] Backtester with win rate, Sharpe ratio, max drawdown reporting (backtester.py)
 
 ## Phase 4 — Risk & Execution
-- [ ] Risk manager: position sizing, stop-loss, take-profit, daily loss limit (risk_manager.py)
-- [ ] Order executor with full trade logging (order_executor.py)
-- [ ] Discord/console alerts on trade events
+- [x] Risk manager: position sizing, stop-loss, take-profit, daily loss limit (risk_manager.py)
+- [x] Order executor with full trade logging (order_executor.py)
+- [x] Discord/console alerts on trade events
 
 ## Phase 5 — Orchestration
 - [ ] Main loop scheduler (market hours aware, 15-min intervals)
 - [ ] End-of-day performance summary
 - [ ] --live flag for switching to real money mode
+- [ ] Add should_retrain(days=30) helper to classifier.py that reads saved_at from classifier_meta.json and triggers retrain when threshold is crossed
 
 ## Phase 6 — Dashboard
 - [ ] Streamlit dashboard: positions, trades, P&L, win rate, confidence chart
