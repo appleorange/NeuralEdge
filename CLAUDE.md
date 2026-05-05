@@ -11,6 +11,14 @@ Tools: gsd and gstack for task/stack management.
 - Review recent lessons in docs/lessons.md if it exists
 - Confirm current git branch before making changes
 
+## Launching the Bot
+- Paper (exits if market closed):  `python main.py`
+- Paper (auto-waits for open):     `python main.py --wait`
+- Live (requires CONFIRM prompt):  `python main.py --live`
+- Background (recommended):        `screen -dmS neuralEdge bash -c 'cd /Users/sabellahan/Downloads/NeuralEdge && /opt/anaconda3/bin/python3 main.py --wait'`
+- Reattach to running session:     `screen -r neuralEdge`
+- Tail logs:                       `tail -f logs/neuralEdge.log`
+
 ## Workflow Orchestration
 
 ### 1. Plan Mode Default

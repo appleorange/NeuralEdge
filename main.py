@@ -2,10 +2,15 @@
 main.py — NeuralEdge orchestration entry point.
 
 Usage:
-    python main.py          # paper trading (safe default)
-    python main.py --live   # live trading (requires explicit CONFIRM prompt)
+    python main.py           # paper trading — exits if market closed
+    python main.py --wait    # paper trading — sleeps until market open, then starts
+    python main.py --live    # live trading (requires explicit CONFIRM prompt)
+    python main.py --wait --live  # live + auto-wait (CONFIRM required before sleeping)
 
-Schedule:
+Recommended background launch (run the night before):
+    screen -dmS neuralEdge bash -c 'cd /path/to/NeuralEdge && python main.py --wait'
+
+Schedule (once running):
     Every 15 min, Mon–Fri 9:30–16:00 ET  → trading_cycle()
     Daily at 16:05 ET                     → end_of_day_summary()
 """
@@ -13,6 +18,7 @@ import argparse
 import logging
 import logging.handlers
 import sys
+import time
 import traceback
 from datetime import date, datetime
 from pathlib import Path
@@ -48,6 +54,8 @@ def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="NeuralEdge trading bot")
     parser.add_argument("--live", action="store_true",
                         help="Enable live trading (default: paper)")
+    parser.add_argument("--wait", action="store_true",
+                        help="If market is closed, sleep until open then start automatically")
     return parser.parse_args()
 
 
@@ -90,6 +98,58 @@ def _check_market_open(paper: bool) -> tuple[bool, str]:
     except Exception as e:
         logger.error("Failed to query Alpaca market clock: %s", e)
         return False, "unknown (Alpaca error)"
+
+
+# ── Wait-for-open loop ───────────────────────────────────────────────────────
+
+def _wait_for_market_open(paper: bool) -> None:
+    """
+    Blocks until Alpaca reports the market is open.
+    Polls every 60 s. Logs a countdown every 10 min so the log shows life.
+    Handles holidays and early closes automatically — truth comes from Alpaca.
+    """
+    from config import ALPACA_API_KEY, ALPACA_SECRET_KEY
+    from alpaca.trading.client import TradingClient
+
+    POLL_SECS = 60
+    LOG_SECS  = 600   # countdown line every 10 min
+
+    client = TradingClient(ALPACA_API_KEY, ALPACA_SECRET_KEY, paper=paper)
+    last_logged: float = 0.0
+
+    while True:
+        try:
+            clock = client.get_clock()
+        except Exception as e:
+            logger.warning("Clock poll failed: %s — retrying in %ds", e, POLL_SECS)
+            time.sleep(POLL_SECS)
+            continue
+
+        if clock.is_open:
+            msg = "[NeuralEdge] Market open — starting scheduler"
+            print(msg)
+            logger.info(msg)
+            return
+
+        # Compute seconds until next open
+        next_open = clock.next_open
+        if next_open.tzinfo is None:
+            import pytz as _tz
+            next_open = _tz.utc.localize(next_open)
+        now_utc = datetime.now(next_open.tzinfo)
+        secs_left = max(0.0, (next_open - now_utc).total_seconds())
+        h = int(secs_left // 3600)
+        m = int((secs_left % 3600) // 60)
+        countdown = f"{h}h {m}m" if h else f"{m}m"
+
+        mono = time.monotonic()
+        if mono - last_logged >= LOG_SECS or last_logged == 0.0:
+            msg = f"[NeuralEdge] Market opens in {countdown} — waiting..."
+            print(msg)
+            logger.info(msg)
+            last_logged = mono
+
+        time.sleep(POLL_SECS)
 
 
 # ── Trading cycle ─────────────────────────────────────────────────────────────
@@ -280,13 +340,22 @@ def main() -> None:
 
     # ── Pre-flight checks ─────────────────────────────────────────────────────
 
-    # 1. Market must be open (exits gracefully if closed)
+    # 1. Market check — exit, or wait, depending on --wait flag
     is_open, next_open = _check_market_open(paper)
     if not is_open:
-        logger.info("Market is closed. Next open: %s", next_open)
-        print(f"[NeuralEdge] Market is closed. Next open: {next_open}")
-        print("[NeuralEdge] Exiting — restart when market is open.")
-        sys.exit(0)
+        if args.wait:
+            print(f"[NeuralEdge] Market opens at {next_open} — sleeping until then")
+            logger.info("Market closed. Next open: %s — entering wait loop", next_open)
+            try:
+                _wait_for_market_open(paper)
+            except KeyboardInterrupt:
+                print("\n[NeuralEdge] Wait interrupted — exiting.")
+                sys.exit(0)
+        else:
+            logger.info("Market is closed. Next open: %s", next_open)
+            print(f"[NeuralEdge] Market is closed. Next open: {next_open}")
+            print("[NeuralEdge] Exiting — use --wait to auto-start when market opens.")
+            sys.exit(0)
 
     # 2. Trained model must exist
     if not MODEL_PATH.exists():
