@@ -7,8 +7,8 @@
 
 ## Phase 1 — Foundation
 - [x] Project scaffold (folder structure, requirements.txt, .env setup)
-- [~] Alpaca API connection + paper trading account verified
-- [~] NewsAPI connection verified
+- [x] Alpaca API connection + paper trading account verified
+- [x] NewsAPI connection verified
 - [x] SQLite database schema designed and initialized
 
 ## Phase 2 — Data Pipeline
