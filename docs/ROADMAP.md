@@ -12,10 +12,10 @@
 - [x] SQLite database schema designed and initialized
 
 ## Phase 2 — Data Pipeline
-- [ ] Historical OHLCV price data fetching (alpaca_client.py)
-- [ ] News headline fetching (news_client.py)
-- [ ] Technical indicators: RSI, MACD, Bollinger Bands, 50/200 SMA (indicators.py)
-- [ ] Data storage and retrieval layer (database.py)
+- [x] Historical OHLCV price data fetching (alpaca_client.py)
+- [x] News headline fetching (news_client.py)
+- [x] Technical indicators: RSI, MACD, Bollinger Bands, 50/200 SMA (indicators.py)
+- [x] Data storage and retrieval layer (database.py)
 
 ## Phase 3 — ML Model
 - [ ] FinBERT sentiment analysis pipeline (sentiment.py)
