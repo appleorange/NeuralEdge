@@ -5,7 +5,14 @@
       "Bash(git --version)",
       "Bash(python3 *)",
       "Bash(pip3 install *)",
-      "Bash(git mv *)"
+      "Bash(git mv *)",
+      "Bash(pip3 show *)",
+      "Bash(brew install *)",
+      "Read(//opt/homebrew/bin/**)",
+      "Read(//usr/local/bin/**)",
+      "Read(//opt/homebrew/opt/**)",
+      "Bash(conda install *)",
+      "Bash(conda run *)"
     ]
   }
 }

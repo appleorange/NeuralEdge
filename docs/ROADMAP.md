@@ -18,10 +18,10 @@
 - [x] Data storage and retrieval layer (database.py)
 
 ## Phase 3 — ML Model
-- [ ] FinBERT sentiment analysis pipeline (sentiment.py)
-- [ ] Feature engineering (combine sentiment + indicators)
-- [ ] XGBoost/Random Forest classifier training (classifier.py)
-- [ ] Backtester with win rate, Sharpe ratio, max drawdown reporting (backtester.py)
+- [x] FinBERT sentiment analysis pipeline (sentiment.py)
+- [x] Feature engineering (combine sentiment + indicators)
+- [x] XGBoost/Random Forest classifier training (classifier.py)
+- [x] Backtester with win rate, Sharpe ratio, max drawdown reporting (backtester.py)
 
 ## Phase 4 — Risk & Execution
 - [ ] Risk manager: position sizing, stop-loss, take-profit, daily loss limit (risk_manager.py)
