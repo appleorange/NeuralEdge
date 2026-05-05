@@ -6,10 +6,10 @@
 - [x] Complete
 
 ## Phase 1 — Foundation
-- [ ] Project scaffold (folder structure, requirements.txt, .env setup)
-- [ ] Alpaca API connection + paper trading account verified
-- [ ] NewsAPI connection verified
-- [ ] SQLite database schema designed and initialized
+- [x] Project scaffold (folder structure, requirements.txt, .env setup)
+- [~] Alpaca API connection + paper trading account verified
+- [~] NewsAPI connection verified
+- [x] SQLite database schema designed and initialized
 
 ## Phase 2 — Data Pipeline
 - [ ] Historical OHLCV price data fetching (alpaca_client.py)
