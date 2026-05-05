@@ -4,6 +4,8 @@ risk_manager.py — Pure position-sizing and order-gate logic.
 No imports from order_executor, Alpaca, or database.
 All decisions are returned as RiskDecision; the caller logs rejections.
 
+Thresholds are defined in config.py (single source of truth) and imported here.
+
 Rules (in evaluation order):
   1. Signal must be BUY
   2. Confidence >= MIN_CONFIDENCE
@@ -12,17 +14,21 @@ Rules (in evaluation order):
   5. Compute position size, stop-loss, take-profit
 """
 import logging
-from dataclasses import dataclass, field
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from config import (
+    DAILY_HALT_PCT,
+    MAX_RISK_PCT,
+    MIN_CONFIDENCE,
+    STOP_LOSS_PCT,
+    TAKE_PROFIT_PCT,
+)
 
 logger = logging.getLogger(__name__)
-
-# ── Constants ─────────────────────────────────────────────────────────────────
-
-STOP_LOSS_PCT   = 0.03   # exit if position falls 3% below entry
-TAKE_PROFIT_PCT = 0.05   # exit if position rises 5% above entry
-MAX_RISK_PCT    = 0.02   # max 2% of portfolio at risk per trade (Kelly-style)
-DAILY_HALT_PCT  = 0.05   # halt all trading if day's P&L drops 5%
-MIN_CONFIDENCE  = 0.65   # minimum classifier confidence to allow an order
 
 
 # ── Decision object ───────────────────────────────────────────────────────────

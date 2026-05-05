@@ -14,11 +14,16 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from config import MIN_CONFIDENCE, STOP_LOSS_PCT, TAKE_PROFIT_PCT
+
 logger = logging.getLogger(__name__)
 
-STOP_LOSS   = -0.03   # -3% from entry
-TAKE_PROFIT =  0.05   # +5% from entry
-MIN_CONFIDENCE = 0.65
+STOP_LOSS   = -STOP_LOSS_PCT    # negative for comparison: price <= entry * (1 - STOP_LOSS_PCT)
+TAKE_PROFIT =  TAKE_PROFIT_PCT
 
 
 @dataclass

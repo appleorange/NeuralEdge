@@ -90,10 +90,29 @@ def get_connection() -> sqlite3.Connection:
     return conn
 
 
+def _migrate_db(conn: sqlite3.Connection) -> None:
+    """Add columns that were absent in earlier schema versions."""
+    migrations = [
+        ("trades", "exit_price",  "REAL"),
+        ("trades", "stop_loss",   "REAL"),
+        ("trades", "take_profit", "REAL"),
+    ]
+    existing = {
+        (row[0], row[1])
+        for table in ["trades", "price_data", "news_headlines", "signals", "performance"]
+        for row in conn.execute(f"PRAGMA table_info({table})").fetchall()
+    }
+    for table, col, col_type in migrations:
+        if (table, col) not in existing:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}")
+            logger.info("Migration: added %s.%s", table, col)
+
+
 def init_db() -> bool:
     try:
         with get_connection() as conn:
             conn.executescript(SCHEMA)
+            _migrate_db(conn)
         logger.info("DB initialized at %s", DB_PATH)
         print(f"[DB] Initialized at {DB_PATH}")
         return True

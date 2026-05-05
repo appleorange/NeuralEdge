@@ -29,10 +29,10 @@
 - [x] Discord/console alerts on trade events
 
 ## Phase 5 — Orchestration
-- [ ] Main loop scheduler (market hours aware, 15-min intervals)
-- [ ] End-of-day performance summary
-- [ ] --live flag for switching to real money mode
-- [ ] Add should_retrain(days=30) helper to classifier.py that reads saved_at from classifier_meta.json and triggers retrain when threshold is crossed
+- [x] Main loop scheduler (market hours aware, 15-min intervals)
+- [x] End-of-day performance summary
+- [x] --live flag for switching to real money mode
+- [x] should_retrain(days=30) helper in config.py — reads saved_at from classifier_meta.json
 
 ## Phase 6 — Dashboard
 - [ ] Streamlit dashboard: positions, trades, P&L, win rate, confidence chart
