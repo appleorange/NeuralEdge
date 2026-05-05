@@ -11,6 +11,7 @@ Schedule:
 """
 import argparse
 import logging
+import logging.handlers
 import sys
 import traceback
 from datetime import date, datetime
@@ -248,11 +249,31 @@ def main() -> None:
     if args.live:
         _confirm_live_mode()
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s — %(message)s",
+    # ── Logging: console + rotating file ─────────────────────────────────────
+    log_dir = Path("logs")
+    log_dir.mkdir(exist_ok=True)
+    log_file = log_dir / "neuralEdge.log"
+
+    fmt = logging.Formatter(
+        "%(asctime)s %(levelname)s %(name)s — %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+
+    # Console handler
+    ch = logging.StreamHandler()
+    ch.setFormatter(fmt)
+    root.addHandler(ch)
+
+    # Rotating file handler: 5 MB per file, keep 7 rotations (~35 MB total)
+    fh = logging.handlers.RotatingFileHandler(
+        log_file, maxBytes=5 * 1024 * 1024, backupCount=7, encoding="utf-8"
+    )
+    fh.setFormatter(fmt)
+    root.addHandler(fh)
+
+    logger.info("Logging to %s", log_file)
 
     mode = "PAPER" if paper else "LIVE"
     print(f"[NeuralEdge] Starting — mode={mode}  watchlist={', '.join(SYMBOLS)}")

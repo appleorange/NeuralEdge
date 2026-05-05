@@ -49,3 +49,7 @@ logs/*
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Log files (keep directory, ignore content)
+logs/*.log
+logs/*.log.*
